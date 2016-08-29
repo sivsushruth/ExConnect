@@ -3,8 +3,21 @@ defmodule ExBridge.SlackRtm do
   alias Slack.Sends
   
   def send_message_as_user(user, message) do
-      rtm = :gproc.lookup_pid({:n, :l, {__MODULE__}}) 
-      send rtm, {:message, "*" <> user <> "* :" <> message, "#bridge"}
+    IO.inspect rtm = :gproc.lookup_pid({:n, :l, {__MODULE__}}) 
+    IO.inspect send rtm, {:outgoing, message, "#bridge"}
+    IO.inspect :websocket_client.cast(self(), {:text, message})
+  end
+
+  def handle_info({:outgoing, text, channel}, slack) do
+    IO.puts "Outgoing #{text} to #{channel}"
+    send_message(text, channel, slack)
+    {:ok}
+  end
+
+  def handle_info({:message, text, channel}, slack) do
+    IO.puts "Sending message #{text} to #{channel}"
+    send_message(text, channel, slack)
+    {:ok}
   end
 
   def handle_info(_, _) do
@@ -18,17 +31,14 @@ defmodule ExBridge.SlackRtm do
   
 
   def handle_message(message = %{type: "message"}, slack) do
-    ExBridge.IrcBot.send_message(<<"slack_bot">>, message[:text])
+    IO.inspect :gproc.lookup_pid({:n, :l, {ExBridge}})
+    IO.inspect message
+    
+    ExBridge.IrcBot.send_message(message[:user], message[:text])
     :ok
   end
 
   def handle_message(_, _) do
-    :ok
-  end
-
-  def handle_info({:message, text, channel}, slack) do
-    IO.puts "Sending message - #{text}"
-    send_message(text, channel, slack)
     :ok
   end
 end

@@ -12,7 +12,8 @@ defmodule ExBridge.IrcBot do
               name:    nil,
               channel: nil,
               client:  nil,
-              send_only: nil
+              send_only: nil,
+              slack_id: nil
 
     def from_params(params) when is_map(params) do
       Enum.reduce(params, %Config{}, fn {k, v}, acc ->
@@ -30,7 +31,7 @@ defmodule ExBridge.IrcBot do
       start_link(params, %{:send_only => false})
   end
 
-  def start_link(%{:nick => nick} = params, opts) when is_map(params) do
+  def start_link(%{:nick => nick, :slack_id => slack_id} = params, opts) when is_map(params) do
     config1 = Config.from_params(params)
     config2 = Map.merge(config1, Config.from_params(opts), fn _k, v1, v2 ->
       case v2 do
@@ -40,7 +41,8 @@ defmodule ExBridge.IrcBot do
     end)
 
     # config2 = %{config1 | Config.from_params(opts)}
-    GenServer.start_link(__MODULE__, [config2], name: String.to_atom(nick))
+    # GenServer.start_link(__MODULE__, [config2], name: String.to_atom(nick))
+    GenServer.start_link(__MODULE__, [config2], name: String.to_atom(slack_id))
   end
 
   def init([config]) do
@@ -51,9 +53,8 @@ defmodule ExBridge.IrcBot do
     {:ok, %Config{config | :client => client}}
   end
 
-  def send_message(nick, message) do
-      IO.inspect message
-      IO.inspect GenServer.cast(String.to_atom(nick), {:send, message})
+  def send_message(slack_id, message) do
+    GenServer.cast(String.to_atom(slack_id), {:send, message})
   end
 
   def handle_cast({:send, message}, config) do

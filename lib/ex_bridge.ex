@@ -5,8 +5,7 @@ defmodule ExBridge do
   def start(_type, _args) do
     # :observer.start()
     import Supervisor.Spec, warn: true
-    IO.inspect _type
-    IO.inspect _args
+    :gproc.reg({:n, :l, {__MODULE__}})
     irc_slack_users = Slack.Web.Users.list(%{token: slack_token})
     |> Map.get("members")
     |> Enum.filter(fn(member) -> member["real_name"] != nil end)
@@ -15,13 +14,14 @@ defmodule ExBridge do
           :server => "chat.freenode.net", 
           :port => 6667,
           :nick => irc_prefix <> member["name"], 
-          :user => irc_prefix <> member["real_name"], 
-          :name => irc_prefix <> member["name"],
-          :channel => "#bridge_test"
+          :user => member["real_name"], 
+          :name => member["name"],
+          :channel => "#bridge_test",
+          :slack_id => member["id"]
         }
     end)
-    |> Enum.slice(1..2)
-
+    |> Enum.reverse
+    |> Enum.slice(1..4)
 
     slack_bot = %{
                     :server => "chat.freenode.net", 
@@ -29,7 +29,8 @@ defmodule ExBridge do
                     :nick => irc_prefix <> "bot", 
                     :user => irc_prefix <> "bot", 
                     :name => irc_prefix <> "bot",
-                    :channel => "#bridge_test"
+                    :channel => "#bridge_test",
+                    :slack_id => "slack_bot"
                   }
 
     irc_workers = irc_slack_users
