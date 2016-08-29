@@ -28,7 +28,7 @@ defmodule ExBridge.IrcBot do
   alias ExIrc.Client
 
   def start_link(params) do
-      start_link(params, %{:send_only => false})
+    start_link(params, %{:send_only => false})
   end
 
   def start_link(%{:nick => nick, :slack_id => slack_id} = params, opts) when is_map(params) do
@@ -46,6 +46,9 @@ defmodule ExBridge.IrcBot do
   end
 
   def init([config]) do
+    :random.seed(:erlang.now())
+    delay = :random.uniform(8000)
+    :timer.sleep(delay)
     {:ok, client}  = ExIrc.start_client!()
     Client.add_handler client, self()
     Logger.debug "Connecting to server #{inspect config}"
@@ -58,8 +61,6 @@ defmodule ExBridge.IrcBot do
   end
 
   def handle_cast({:send, message}, config) do
-    IO.inspect message
-    IO.inspect config
     Client.msg config.client, :privmsg, config.channel, message
     {:noreply, config}
   end
@@ -93,12 +94,14 @@ defmodule ExBridge.IrcBot do
   end
   def handle_info({:received, msg, %ExIrc.SenderInfo{:nick => nick}, channel}, config) do
     %{:send_only => send_only} = config
+    IO.inspect (nick)
     IO.inspect config
-    case send_only do
-      true -> :ok
-      _ -> 
+    case {send_only, String.starts_with?(nick, ExBridge.Util.irc_prefix)} do
+      {true, _} -> :ok
+      {_, false} -> 
           Logger.info "#{nick} from #{channel}: #{msg}"
           ExBridge.SlackRtm.send_message_as_user(nick, msg)
+      _ -> :ok    
     end
     {:noreply, config}
   end

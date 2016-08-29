@@ -12,20 +12,19 @@ defmodule ExBridge do
     |> Enum.map(fn(member) ->
       %{
           :server => "chat.freenode.net", 
-          :port => 6667,
+          :port => 8000,
           :nick => irc_prefix <> member["name"], 
-          :user => member["real_name"], 
-          :name => member["name"],
+          :user => irc_prefix <> member["real_name"], 
+          :name => irc_prefix <> member["name"],
           :channel => "#bridge_test",
           :slack_id => member["id"]
         }
     end)
     |> Enum.reverse
-    |> Enum.slice(1..4)
 
     slack_bot = %{
                     :server => "chat.freenode.net", 
-                    :port => 6667,
+                    :port => 8000,
                     :nick => irc_prefix <> "bot", 
                     :user => irc_prefix <> "bot", 
                     :name => irc_prefix <> "bot",

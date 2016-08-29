@@ -4,8 +4,7 @@ defmodule ExBridge.SlackRtm do
   
   def send_message_as_user(user, message) do
     IO.inspect rtm = :gproc.lookup_pid({:n, :l, {__MODULE__}}) 
-    IO.inspect send rtm, {:outgoing, message, "#bridge"}
-    IO.inspect :websocket_client.cast(self(), {:text, message})
+    IO.inspect send rtm, {:outgoing, "*" <> user <> "*: " <> message, "#general"}
   end
 
   def handle_info({:outgoing, text, channel}, slack) do
@@ -15,8 +14,8 @@ defmodule ExBridge.SlackRtm do
   end
 
   def handle_info({:message, text, channel}, slack) do
-    IO.puts "Sending message #{text} to #{channel}"
-    send_message(text, channel, slack)
+    IO.puts "Got message #{text} from #{channel}"
+    # send_message(text, channel, slack)
     {:ok}
   end
 
