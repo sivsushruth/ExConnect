@@ -32,9 +32,25 @@ defmodule ExConnect.SlackRtm do
   def handle_message(message = %{type: "message"}, slack) do
     IO.inspect :gproc.lookup_pid({:n, :l, {ExConnect}})
     IO.inspect message
-
-    ExConnect.IrcBot.send_message(message[:user], message[:text])
+    {irc_message, _} = maybe_perform_action(message, slack)
+    ExConnect.IrcBot.send_message(irc_message[:user], irc_message[:text])
     :ok
+  end
+
+  def maybe_perform_action(message, slack) do
+    case message[:text] |> String.downcase |> String.contains?("send slack invite") do
+      true ->
+        send_slack_invite(message[:text])
+      false -> :ok
+    end
+    {message, slack}
+  end
+
+  def send_slack_invite(text) do
+    case Regex.named_captures(~r/mailto:(?<email>(\S)*)\|(\S)*>/, text) do
+      %{"email" => email} -> ExConnect.SlackWeb.send_invite(email)
+      _ -> {:error, "email not valid"}
+    end
   end
 
   def handle_message(_, _) do
