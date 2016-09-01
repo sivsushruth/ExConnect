@@ -15,7 +15,7 @@ defmodule ExBridge.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :slack, :exirc, :gproc],
+      applications: [:logger, :slack, :exirc, :gproc, :httpoison],
        mod: {ExBridge, []}
     ]
   end
@@ -34,7 +34,8 @@ defmodule ExBridge.Mixfile do
       {:slack, "~> 0.7.0"},
       {:websocket_client, git: "https://github.com/jeremyong/websocket_client"},
       {:exirc, "~> 0.11.0"},
-      {:gproc, "~> 0.5.0"}
+      {:gproc, "~> 0.5.0"},
+      {:httpoison, "~> 0.9.0", override: true}
     ]
   end
 end

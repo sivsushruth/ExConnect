@@ -11,10 +11,10 @@ defmodule ExBridge do
     |> Enum.filter(fn(member) -> member["real_name"] != nil end)
     |> Enum.map(fn(member) ->
       %{
-          :server => "chat.freenode.net", 
+          :server => "chat.freenode.net",
           :port => 8000,
-          :nick => irc_prefix <> member["name"], 
-          :user => irc_prefix <> member["real_name"], 
+          :nick => irc_prefix <> member["name"],
+          :user => irc_prefix <> member["real_name"],
           :name => irc_prefix <> member["name"],
           :channel => "#bridge_test",
           :slack_id => member["id"]
@@ -23,10 +23,10 @@ defmodule ExBridge do
     |> Enum.reverse
 
     slack_bot = %{
-                    :server => "chat.freenode.net", 
+                    :server => "chat.freenode.net",
                     :port => 8000,
-                    :nick => irc_prefix <> "bot", 
-                    :user => irc_prefix <> "bot", 
+                    :nick => irc_prefix <> "bot",
+                    :user => irc_prefix <> "bot",
                     :name => irc_prefix <> "bot",
                     :channel => "#bridge_test",
                     :slack_id => "slack_bot"
@@ -36,7 +36,7 @@ defmodule ExBridge do
                   |> Enum.map(fn bot -> worker(ExBridge.IrcBot, [bot, %{:send_only => true}], id: bot[:nick]) end)
     children = [
                   worker(ExBridge.SlackRtm, [slack_token], id: "slack_rtm"),
-                  worker(ExBridge.IrcBot, [slack_bot], id: "slack_bot")      
+                  worker(ExBridge.IrcBot, [slack_bot], id: "slack_bot")
                ] ++ irc_workers
 
     opts = [strategy: :one_for_one, name: ExBridge.Supervisor]

@@ -2,18 +2,19 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 config :ex_bridge,
-        slack_token: <<"xoxb-73737181729-phTJw92NfykTY91Pa4Rn04f8">>,
+        slack_token: "xxx",
         bots: [
             %{
-                :server => "chat.freenode.net", 
-                :port => 6667,
-                :nick => "slack_bot", 
-                :user => "slack_bot", 
+                :server => "chat.freenode.net",
+                :port => 8000,
+                :nick => "slack_bot",
+                :user => "slack_bot",
                 :name => "Slack Bot",
                 :channel => "#bridge_test"
             }
         ],
-        irc_prefix: "slack_"
+        irc_prefix: "slack_",
+        admin_token: "xxx"
 
 
 # This configuration is loaded before any dependency and is restricted

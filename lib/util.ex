@@ -5,5 +5,10 @@ defmodule ExBridge.Util do
 
   def irc_prefix do
     Application.get_env(:ex_bridge, :irc_prefix, "slack_")
-  end 
+  end
+
+  def admin_token do
+    Application.get_env(:ex_bridge, :admin_token)
+  end
+
 end
