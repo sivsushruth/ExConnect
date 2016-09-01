@@ -1,6 +1,6 @@
-defmodule ExBridge do
+defmodule ExConnect do
   use Application
-  import ExBridge.Util
+  import ExConnect.Util
 
   def start(_type, _args) do
     # :observer.start()
@@ -33,13 +33,13 @@ defmodule ExBridge do
                   }
 
     irc_workers = irc_slack_users
-                  |> Enum.map(fn bot -> worker(ExBridge.IrcBot, [bot, %{:send_only => true}], id: bot[:nick]) end)
+                  |> Enum.map(fn bot -> worker(ExConnect.IrcBot, [bot, %{:send_only => true}], id: bot[:nick]) end)
     children = [
-                  worker(ExBridge.SlackRtm, [slack_token], id: "slack_rtm"),
-                  worker(ExBridge.IrcBot, [slack_bot], id: "slack_bot")
+                  worker(ExConnect.SlackRtm, [slack_token], id: "slack_rtm"),
+                  worker(ExConnect.IrcBot, [slack_bot], id: "slack_bot")
                ] ++ irc_workers
 
-    opts = [strategy: :one_for_one, name: ExBridge.Supervisor]
+    opts = [strategy: :one_for_one, name: ExConnect.Supervisor]
     Supervisor.start_link(children, opts)
   end
 

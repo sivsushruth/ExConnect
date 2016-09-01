@@ -1,7 +1,7 @@
 # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
-config :ex_bridge,
+config :ex_connect,
         slack_token: "xxx",
         bots: [
             %{
@@ -25,11 +25,11 @@ config :ex_bridge,
 
 # You can configure for your application as:
 #
-#     config :ex_bridge, key: :value
+#     config :ex_connect, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:ex_bridge, :key)
+#     Application.get_env(:ex_connect, :key)
 #
 # Or configure a 3rd-party app:
 #

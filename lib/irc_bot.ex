@@ -1,7 +1,7 @@
-defmodule ExBridge.IrcBot do
+defmodule ExConnect.IrcBot do
   use GenServer
   require Logger
-  import ExBridge.Util
+  import ExConnect.Util
 
   defmodule Config do
     defstruct server:  nil,
@@ -96,12 +96,12 @@ defmodule ExBridge.IrcBot do
     %{:send_only => send_only} = config
     IO.inspect (nick)
     IO.inspect config
-    case {send_only, String.starts_with?(nick, ExBridge.Util.irc_prefix)} do
+    case {send_only, String.starts_with?(nick, ExConnect.Util.irc_prefix)} do
       {true, _} -> :ok
-      {_, false} -> 
+      {_, false} ->
           Logger.info "#{nick} from #{channel}: #{msg}"
-          ExBridge.SlackRtm.send_message_as_user(nick, msg)
-      _ -> :ok    
+          ExConnect.SlackRtm.send_message_as_user(nick, msg)
+      _ -> :ok
     end
     {:noreply, config}
   end

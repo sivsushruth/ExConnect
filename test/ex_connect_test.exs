@@ -1,6 +1,6 @@
-defmodule ExBridgeTest do
+defmodule ExConnectTest do
   use ExUnit.Case
-  doctest ExBridge
+  doctest ExConnect
 
   test "the truth" do
     assert 1 + 1 == 2
