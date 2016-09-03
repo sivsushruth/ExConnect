@@ -22,8 +22,8 @@ defmodule ExConnect.Mixfile do
       {:slack, "~> 0.7.0"},
       {:websocket_client, git: "https://github.com/jeremyong/websocket_client"},
       {:exirc, "~> 0.11.0"},
-      {:gproc, "~> 0.5.0"},
-      {:httpoison, "~> 0.9.0", override: true}
+      {:gproc, git: "https://github.com/uwiger/gproc", tag: "0.6"},
+      {:httpoison, git: "https://github.com/edgurgel/httpoison", override: true}
     ]
   end
 end

@@ -1,5 +1,6 @@
 defmodule ExConnect.SlackRtm do
   use Slack
+  import ExConnect.Util
   alias Slack.Sends
 
   def send_message_as_user(user, message) do
@@ -30,10 +31,32 @@ defmodule ExConnect.SlackRtm do
 
 
   def handle_message(message = %{type: "message"}, slack) do
-    IO.inspect :gproc.lookup_pid({:n, :l, {ExConnect}})
-    IO.inspect message
+    :gproc.lookup_pid({:n, :l, {ExConnect}})
     {irc_message, _} = maybe_perform_action(message, slack)
     ExConnect.IrcBot.send_message(irc_message[:user], irc_message[:text])
+    :ok
+  end
+
+  def handle_message(message = %{type: "presence_change", presence: presence}, slack) do
+    Logger.debug "=====> Info "
+    case presence do
+      "away" -> :ok
+        #ExConnect.IrcBot.maybe_remove_bot(message[:user])
+      _  ->
+        member = Slack.Web.Users.info(message[:user], %{token: slack_token})
+        irc_slack_user = %{
+                      :server => "chat.freenode.net",
+                      :port => 8000,
+                      :nick => irc_prefix <> (member["user"]["name"]),
+                      :user => irc_prefix <> (member["user"]["real_name"]),
+                      :name => irc_prefix <> (member["user"]["name"]),
+                      :channel => "#bridge_test",
+                      :slack_id => member["user"]["id"]
+                    }
+        IO.inspect irc_slack_user
+        sup_pid = :gproc.lookup_pid({:n, :l, {:supervisor}})
+        Supervisor.start_child(sup_pid, [{:irc, irc_slack_user}])
+    end
     :ok
   end
 

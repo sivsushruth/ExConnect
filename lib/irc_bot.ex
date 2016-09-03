@@ -2,28 +2,7 @@ defmodule ExConnect.IrcBot do
   use GenServer
   require Logger
   import ExConnect.Util
-
-  defmodule Config do
-    defstruct server:  nil,
-              port:    nil,
-              pass:    nil,
-              nick:    nil,
-              user:    nil,
-              name:    nil,
-              channel: nil,
-              client:  nil,
-              send_only: nil,
-              slack_id: nil
-
-    def from_params(params) when is_map(params) do
-      Enum.reduce(params, %Config{}, fn {k, v}, acc ->
-        case Map.has_key?(acc, k) do
-          true  -> Map.put(acc, k, v)
-          false -> acc
-        end
-      end)
-    end
-  end
+  alias ExConnect.Config, as: Config
 
   alias ExIrc.Client
 
@@ -39,16 +18,13 @@ defmodule ExConnect.IrcBot do
         _ -> v2
       end
     end)
-
-    # config2 = %{config1 | Config.from_params(opts)}
-    # GenServer.start_link(__MODULE__, [config2], name: String.to_atom(nick))
     GenServer.start_link(__MODULE__, [config2], name: String.to_atom(slack_id))
   end
 
   def init([config]) do
-    :random.seed(:erlang.now())
-    delay = :random.uniform(8000)
-    :timer.sleep(delay)
+    #:random.seed(:erlang.now())
+    #delay = :random.uniform(8000)
+    #:timer.sleep(delay)
     {:ok, client}  = ExIrc.start_client!()
     Client.add_handler client, self()
     Logger.debug "Connecting to server #{inspect config}"
@@ -58,6 +34,11 @@ defmodule ExConnect.IrcBot do
 
   def send_message(slack_id, message) do
     GenServer.cast(String.to_atom(slack_id), {:send, message})
+  end
+
+  def maybe_remove_bot(slack_id) do
+    IO.inspect GenServer.whereis(String.to_atom(slack_id))
+    GenServer.stop(String.to_atom(slack_id))
   end
 
   def handle_cast({:send, message}, config) do
