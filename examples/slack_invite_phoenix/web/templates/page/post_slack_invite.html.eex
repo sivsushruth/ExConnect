@@ -1,0 +1,9 @@
+<div class="jumbotron">
+    <p> Invite has been successfully sent to <%= @email %> </p>
+    <p> Redirecting to Slack! </p>
+</div>
+<script>
+    var timer = setTimeout(function() {
+        window.location='https://barrel-db.slack.com/messages/general/'
+    }, 4000);
+</script>

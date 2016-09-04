@@ -1,0 +1,10 @@
+<div class="jumbotron">
+  <%= form_for @conn, page_path(@conn, :slack_invite), [as: :slack_invite], fn f -> %>
+    <div class="form-group">
+      <%= email_input :user, :email, placeholder: "Enter your Email ID here", class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= submit "Send Invite", class: "btn btn-info", style: "margin-top: 15px; width: 50% " %>
+    </div>
+  <% end %>
+</div>
