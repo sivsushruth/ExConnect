@@ -63,17 +63,21 @@ defmodule ExConnect.SlackRtm do
   def maybe_perform_action(message, slack) do
     case message[:text] |> String.downcase |> String.contains?("send slack invite") do
       true ->
-        send_slack_invite(message[:text])
+        send_slack_invite({:full_text, message[:text]})
       false -> :ok
     end
     {message, slack}
   end
 
-  def send_slack_invite(text) do
+  def send_slack_invite({:full_text, text}) do
     case Regex.named_captures(~r/mailto:(?<email>(\S)*)\|(\S)*>/, text) do
       %{"email" => email} -> ExConnect.SlackWeb.send_invite(email)
       _ -> {:error, "email not valid"}
     end
+  end
+
+  def send_slack_invite({:email, email}) do
+    ExConnect.SlackWeb.send_invite(email)
   end
 
   def handle_message(_, _) do
